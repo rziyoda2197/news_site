@@ -1,0 +1,99 @@
+{% extends "news/base.html" %}
+
+{% block title %}Aloqa — News Portal{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="row g-4">
+                    <!-- Contact Info -->
+                    <div class="col-md-5">
+                        <div class="contact-info-card">
+                            <h3><i class="bi bi-headset me-2"></i>Bog'lanish</h3>
+                            <p class="text-muted-light">Savollaringiz bo'lsa, biz bilan bog'laning. Tez orada javob
+                                beramiz.</p>
+                            <ul class="contact-info-list">
+                                <li>
+                                    <div class="contact-icon"><i class="bi bi-geo-alt"></i></div>
+                                    <div>
+                                        <strong>Manzil</strong>
+                                        <p>Toshkent shahri, O'zbekiston</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="contact-icon"><i class="bi bi-envelope"></i></div>
+                                    <div>
+                                        <strong>Email</strong>
+                                        <p>info@newsportal.uz</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="contact-icon"><i class="bi bi-telephone"></i></div>
+                                    <div>
+                                        <strong>Telefon</strong>
+                                        <p>+998 90 123 45 67</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Contact Form -->
+                    <div class="col-md-7">
+                        <div class="form-card">
+                            <h3 class="form-card-title"><i class="bi bi-pencil-square me-2"></i>Xabar yuborish</h3>
+
+                            {% if sent %}
+                            <div class="alert alert-success">
+                                <i class="bi bi-check-circle me-2"></i>Xabaringiz muvaffaqiyatli yuborildi! Tez orada
+                                javob beramiz.
+                            </div>
+                            {% else %}
+                            <form method="post">
+                                {% csrf_token %}
+                                {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>Iltimos, quyidagi xatolarni tuzating:
+                                    <ul class="mb-0 mt-2">
+                                        {% for field in form %}
+                                        {% for error in field.errors %}
+                                        <li>{{ field.label }}: {{ error }}</li>
+                                        {% endfor %}
+                                        {% endfor %}
+                                        {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                                <div class="mb-3">
+                                    <label class="form-label">Ismingiz</label>
+                                    {{ form.name }}
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    {{ form.email }}
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Mavzu</label>
+                                    {{ form.subject }}
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Xabar</label>
+                                    {{ form.message }}
+                                </div>
+                                <button type="submit" class="btn btn-accent w-100">
+                                    <i class="bi bi-send me-2"></i>Yuborish
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "news/base.html" %}
+{% load static %}
+
+{% block title %}News Portal — Eng so'ngi yangiliklar{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-content text-center">
+            <h1 class="hero-title">Eng so'ngi <span class="text-accent">yangiliklar</span></h1>
+            <p class="hero-subtitle">Dunyo va O'zbekiston yangiliklarini tezkor va ishonchli tarzda kuzatib boring</p>
+            <a href="{% url 'news:post_list' %}" class="btn btn-accent btn-lg mt-3">
+                <i class="bi bi-arrow-right me-2"></i>Barcha yangiliklar
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Latest News -->
+<section class="py-5">
+    <div class="container">
+        <div class="section-header">
+            <h2><i class="bi bi-clock-history me-2"></i>So'nggi yangiliklar</h2>
+            <a href="{% url 'news:post_list' %}" class="btn btn-outline-accent btn-sm">Barchasi <i
+                    class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="row g-4">
+            {% for post in latest_posts %}
+            <div class="col-lg-4 col-md-6">
+                <article class="news-card">
+                    <div class="news-card-img">
+                        {% if post.image %}
+                        <img src="{{ post.image.url }}" alt="{{ post.title }}">
+                        {% else %}
+                        <div class="placeholder-img"><i class="bi bi-image"></i></div>
+                        {% endif %}
+                        {% if post.category %}
+                        <span class="card-category">{{ post.category.name }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="news-card-body">
+                        <div class="card-meta">
+                            <span><i class="bi bi-calendar3 me-1"></i>{{ post.publish|date:"d M, Y" }}</span>
+                            <span><i class="bi bi-eye me-1"></i>{{ post.views_count }}</span>
+                        </div>
+                        <h3 class="card-title">
+                            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                        </h3>
+                        <p class="card-text">{{ post.body|truncatewords:20 }}</p>
+                        <a href="{{ post.get_absolute_url }}" class="read-more">
+                            Batafsil <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <p>Hozircha yangiliklar yo'q</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Most Read -->
+{% if most_read %}
+<section class="py-5 most-read-section">
+    <div class="container">
+        <div class="section-header">
+            <h2><i class="bi bi-fire me-2"></i>Eng ko'p o'qilgan</h2>
+        </div>
+        <div class="row g-4">
+            {% for post in most_read %}
+            <div class="col-lg-4 col-md-6">
+                <article class="news-card most-read-card">
+                    <div class="news-card-body">
+                        <span class="rank-badge">{{ forloop.counter }}</span>
+                        <div class="card-meta">
+                            <span><i class="bi bi-eye me-1"></i>{{ post.views_count }} ko'rilgan</span>
+                            {% if post.category %}
+                            <span class="badge bg-accent-subtle">{{ post.category.name }}</span>
+                            {% endif %}
+                        </div>
+                        <h3 class="card-title">
+                            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                        </h3>
+                        <p class="card-text">{{ post.body|truncatewords:15 }}</p>
+                    </div>
+                </article>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

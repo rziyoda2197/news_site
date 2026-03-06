@@ -1,0 +1,67 @@
+{% extends "news/base.html" %}
+
+{% block title %}Yangilikni ulashish — News Portal{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="form-card">
+                    <h1 class="form-card-title"><i class="bi bi-share me-2"></i>Yangilikni ulashish</h1>
+                    <p class="text-muted-light mb-4">
+                        <strong>"{{ post.title }}"</strong> yangiligini email orqali do'stingizga yuboring.
+                    </p>
+
+                    {% if sent %}
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle me-2"></i>Yangilik muvaffaqiyatli yuborildi!
+                    </div>
+                    <a href="{{ post.get_absolute_url }}" class="btn btn-accent">
+                        <i class="bi bi-arrow-left me-2"></i>Yangilikka qaytish
+                    </a>
+                    {% else %}
+                    <form method="post">
+                        {% csrf_token %}
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Iltimos, quyidagi xatolarni tuzating:
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                {% for error in field.errors %}
+                                <li>{{ field.label }}: {{ error }}</li>
+                                {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        <div class="mb-3">
+                            <label class="form-label">Ismingiz</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Sizning emailingiz</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Qabul qiluvchi email</label>
+                            {{ form.to }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Izoh (ixtiyoriy)</label>
+                            {{ form.comments }}
+                        </div>
+                        <button type="submit" class="btn btn-accent w-100">
+                            <i class="bi bi-send me-2"></i>Yuborish
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

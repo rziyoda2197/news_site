@@ -1,0 +1,180 @@
+{% extends "news/base.html" %}
+
+{% block title %}{{ post.title }} — News Portal{% endblock %}
+{% block meta_description %}{{ post.body|truncatewords:25 }}{% endblock %}
+{% block og_title %}{{ post.title }}{% endblock %}
+{% block og_description %}{{ post.body|truncatewords:25 }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_image %}
+{% if post.image %}
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ post.image.url }}">
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Article -->
+            <div class="col-lg-8">
+                <article class="article-detail">
+                    <div class="article-header">
+                        {% if post.category %}
+                        <a href="{{ post.category.get_absolute_url }}" class="article-category">{{ post.category.name
+                            }}</a>
+                        {% endif %}
+                        <h1 class="article-title">{{ post.title }}</h1>
+                        <div class="article-meta">
+                            <span><i class="bi bi-person me-1"></i>{{
+                                post.author.get_full_name|default:post.author.username }}</span>
+                            <span><i class="bi bi-calendar3 me-1"></i>{{ post.publish|date:"d F, Y" }}</span>
+                            <span><i class="bi bi-eye me-1"></i>{{ post.views_count }} ko'rilgan</span>
+                            <span><i class="bi bi-chat-dots me-1"></i>{{ comments.count }} izoh</span>
+                        </div>
+                    </div>
+
+                    {% if post.image %}
+                    <div class="article-image">
+                        <img src="{{ post.image.url }}" alt="{{ post.title }}" class="img-fluid rounded-3">
+                    </div>
+                    {% endif %}
+
+                    <div class="article-body">
+                        {{ post.body|linebreaks }}
+                    </div>
+
+                    <!-- Tags -->
+                    {% if post.get_tags_list %}
+                    <div class="article-tags">
+                        <i class="bi bi-tags me-2"></i>
+                        {% for tag in post.get_tags_list %}
+                        <a href="{% url 'news:tag_posts' tag %}" class="tag-link">{{ tag }}</a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Share -->
+                    <div class="article-share">
+                        <span class="share-label"><i class="bi bi-share me-2"></i>Ulashish:</span>
+                        <a href="{% url 'news:post_share' post.slug %}" class="btn btn-sm btn-outline-accent"
+                            title="Email orqali ulashish">
+                            <i class="bi bi-envelope"></i> Email
+                        </a>
+                        <a href="https://t.me/share/url?url={{ request.build_absolute_uri }}" target="_blank"
+                            class="btn btn-sm btn-outline-info">
+                            <i class="bi bi-telegram"></i> Telegram
+                        </a>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+                            target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-facebook"></i> Facebook
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Comments Section -->
+                <div class="comments-section" id="comments">
+                    <h3 class="section-title"><i class="bi bi-chat-dots me-2"></i>Izohlar ({{ comments.count }})</h3>
+
+                    {% if commented %}
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle me-2"></i>Izohingiz muvaffaqiyatli qo'shildi!
+                    </div>
+                    {% endif %}
+
+                    {% for comment in comments %}
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <div class="comment-avatar">{{ comment.name|first|upper }}</div>
+                            <div>
+                                <strong>{{ comment.name }}</strong>
+                                <small class="text-muted ms-2">{{ comment.created|date:"d M, Y H:i" }}</small>
+                            </div>
+                        </div>
+                        <div class="comment-body">{{ comment.body|linebreaks }}</div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-state-sm">
+                        <p>Hali izohlar yo'q. Birinchi bo'lib fikr bildiring!</p>
+                    </div>
+                    {% endfor %}
+
+                    <!-- Comment Form -->
+                    <div class="comment-form-wrapper">
+                        <h4><i class="bi bi-pencil-square me-2"></i>Izoh qoldirish</h4>
+                        <form method="post" action="{{ post.get_absolute_url }}#comments">
+                            {% csrf_token %}
+                            {% if comment_form.errors %}
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle me-2"></i>Iltimos, quyidagi xatolarni tuzating:
+                                <ul class="mb-0 mt-2">
+                                    {% for field in comment_form %}
+                                    {% for error in field.errors %}
+                                    <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                    {% endfor %}
+                                    {% for error in comment_form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    {{ comment_form.name }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ comment_form.email }}
+                                </div>
+                                <div class="col-12">
+                                    {{ comment_form.body }}
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-accent">
+                                        <i class="bi bi-send me-2"></i>Yuborish
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <aside class="sidebar">
+                    <!-- Similar Posts -->
+                    {% if similar_posts %}
+                    <div class="sidebar-widget">
+                        <h4 class="widget-title"><i class="bi bi-link-45deg me-2"></i>O'xshash yangiliklar</h4>
+                        {% for spost in similar_posts %}
+                        <div class="sidebar-post">
+                            {% if spost.image %}
+                            <img src="{{ spost.image.url }}" alt="{{ spost.title }}">
+                            {% endif %}
+                            <div>
+                                <a href="{{ spost.get_absolute_url }}">{{ spost.title }}</a>
+                                <small>{{ spost.publish|date:"d M, Y" }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Categories -->
+                    <div class="sidebar-widget">
+                        <h4 class="widget-title"><i class="bi bi-folder me-2"></i>Kategoriyalar</h4>
+                        <ul class="category-list">
+                            {% for cat in all_categories %}
+                            <li>
+                                <a href="{{ cat.get_absolute_url }}">{{ cat.name }}</a>
+                                <span class="badge bg-accent-subtle">{{ cat.posts.count }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

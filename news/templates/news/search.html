@@ -1,0 +1,66 @@
+{% extends "news/base.html" %}
+
+{% block title %}Qidiruv — News Portal{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="bi bi-search me-2"></i>Yangilik qidirish</h1>
+        </div>
+
+        <div class="search-box mb-4">
+            <form method="get" action="{% url 'news:post_search' %}">
+                <div class="input-group input-group-lg">
+                    {{ form.query }}
+                    <button class="btn btn-accent" type="submit"><i class="bi bi-search me-2"></i>Qidirish</button>
+                </div>
+            </form>
+        </div>
+
+        {% if query %}
+        <p class="results-info mb-4">
+            <strong>"{{ query }}"</strong> bo'yicha <strong>{{ results|length }}</strong> natija topildi
+        </p>
+
+        <div class="row g-4">
+            {% for post in results %}
+            <div class="col-lg-4 col-md-6">
+                <article class="news-card">
+                    <div class="news-card-img">
+                        {% if post.image %}
+                        <img src="{{ post.image.url }}" alt="{{ post.title }}">
+                        {% else %}
+                        <div class="placeholder-img"><i class="bi bi-image"></i></div>
+                        {% endif %}
+                        {% if post.category %}
+                        <span class="card-category">{{ post.category.name }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="news-card-body">
+                        <div class="card-meta">
+                            <span><i class="bi bi-calendar3 me-1"></i>{{ post.publish|date:"d M, Y" }}</span>
+                            <span><i class="bi bi-eye me-1"></i>{{ post.views_count }}</span>
+                        </div>
+                        <h3 class="card-title">
+                            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                        </h3>
+                        <p class="card-text">{{ post.body|truncatewords:20 }}</p>
+                        <a href="{{ post.get_absolute_url }}" class="read-more">Batafsil <i
+                                class="bi bi-arrow-right"></i></a>
+                    </div>
+                </article>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="empty-state">
+                    <i class="bi bi-search"></i>
+                    <p>"{{ query }}" bo'yicha natija topilmadi</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
